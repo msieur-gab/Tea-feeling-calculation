@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculateur de Profil de Thé</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        input, select {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background: #5c9210;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #4a760d;
+        }
+        #result {
+            margin-top: 20px;
+            padding: 10px;
+            background: #e7f3d5;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Calculateur de Profil de Thé</h1>
+        <form id="teaForm">
+            <label for="name">Nom du Thé:</label>
+            <input type="text" id="name" required>
+            
+            <label for="type">Type de Thé:</label>
+            <select id="type" required>
+                <option value="green">Vert</option>
+                <option value="black">Noir</option>
+                <option value="oolong">Oolong</option>
+                <option value="white">Blanc</option>
+                <option value="puerh">Pu-erh</option>
+            </select>
+            
+            <label for="caffeineLevel">Niveau de Caféine (1-5):</label>
+            <input type="number" id="caffeineLevel" min="1" max="5" required>
+            
+            <label for="lTheanineLevel">Niveau de L-théanine (1-5):</label>
+            <input type="number" id="lTheanineLevel" min="1" max="5" required>
+            
+            <label for="aromaPrimary">Arôme Principal:</label>
+            <select id="aromaPrimary" required>
+                <option value="floral">Floral</option>
+                <option value="fruity">Fruité</option>
+                <option value="earthy">Terreux</option>
+                <option value="grassy">Herbacé</option>
+                <option value="spicy">Epicé</option>
+            </select>
+            
+            <label for="processingMethod">Méthode de Traitement:</label>
+            <select id="processingMethod" required>
+                <option value="steamed">Vapeur</option>
+                <option value="pan-fired">Torréfié</option>
+                <option value="oxidized">Oxydé</option>
+                <option value="roasted">Grillé</option>
+            </select>
+            
+            <label for="brewingTemp">Température d'Infusion (°C):</label>
+            <input type="number" id="brewingTemp" required>
+            
+            <button type="submit">Calculer le Profil</button>
+        </form>
+        
+        <div id="result"></div>
+    </div>
+
+    <script>
+    // Fonction pour calculer le mood du thé
+    function calculateTeaMood(teaParams) {
+        const { type, caffeineLevel, lTheanineLevel, aromaPrimary, processingMethod } = teaParams;
+        
+        let energyScore = 0;
+        let calmScore = 0;
+        let refreshScore = 0;
+        let comfortScore = 0;
+        
+        // Type influence
+        switch (type.toLowerCase()) {
+            case 'green':
+                refreshScore += 2;
+                break;
+            case 'black':
+                energyScore += 2;
+                break;
+            case 'oolong':
+                calmScore += 1;
+                refreshScore += 1;
+                break;
+            case 'white':
+                calmScore += 2;
+                break;
+            case 'puerh':
+                comfortScore += 2;
+                break;
+        }
+        
+        // Caffeine influence
+        energyScore += caffeineLevel;
+        calmScore += (6 - caffeineLevel); // Inverse relationship
+        
+        // L-theanine influence
+        calmScore += lTheanineLevel;
+        
+        // Aroma influence
+        switch (aromaPrimary.toLowerCase()) {
+            case 'floral':
+                refreshScore += 2;
+                break;
+            case 'fruity':
+                refreshScore += 1;
+                energyScore += 1;
+                break;
+            case 'earthy':
+                comfortScore += 2;
+                break;
+            case 'grassy':
+                refreshScore += 2;
+                break;
+            case 'spicy':
+                energyScore += 1;
+                comfortScore += 1;
+                break;
+        }
+        
+        // Processing method influence
+        switch (processingMethod.toLowerCase()) {
+            case 'steamed':
+                refreshScore += 1;
+                break;
+            case 'pan-fired':
+                energyScore += 1;
+                break;
+            case 'oxidized':
+                comfortScore += 1;
+                break;
+            case 'roasted':
+                comfortScore += 2;
+                break;
+        }
+        
+        // Determine the primary mood
+        const scores = [
+            { mood: 'Energizing & Uplifting', score: energyScore },
+            { mood: 'Calm & Focused', score: calmScore },
+            { mood: 'Serene & Refreshing', score: refreshScore },
+            { mood: 'Cozy & Comforting', score: comfortScore }
+        ];
+        
+        scores.sort((a, b) => b.score - a.score);
+        
+        // If there's a clear winner, return that mood
+        if (scores[0].score > scores[1].score) {
+            return scores[0].mood;
+        }
+        
+        // If it's a tie between top two, combine them
+        return `${scores[0].mood} with hints of ${scores[1].mood.toLowerCase()}`;
+    }
+
+    // Fonction pour calculer le niveau de relaxation du thé
+    function calculateTeaRelaxation(teaParams) {
+        const { type, caffeineLevel, lTheanineLevel, aromaPrimary, brewingTemp } = teaParams;
+        
+        let relaxationScore = 0;
+        
+        // Type influence
+        switch (type.toLowerCase()) {
+            case 'white':
+                relaxationScore += 2;
+                break;
+            case 'green':
+            case 'oolong':
+                relaxationScore += 1;
+                break;
+            case 'puerh':
+                relaxationScore += 0.5;
+                break;
+            // Black tea doesn't add to relaxation score
+        }
+        
+        // Caffeine influence (inverse relationship)
+        relaxationScore += (6 - caffeineLevel);
+        
+        // L-theanine influence
+        relaxationScore += lTheanineLevel;
+        
+        // Aroma influence
+        switch (aromaPrimary.toLowerCase()) {
+            case 'floral':
+            case 'herbal':
+                relaxationScore += 1;
+                break;
+            case 'fruity':
+            case 'grassy':
+                relaxationScore += 0.5;
+                break;
+            // Other aromas don't add to relaxation score
+        }
+        
+        // Brewing temperature influence
+        if (brewingTemp < 75) {
+            relaxationScore += 1;
+        } else if (brewingTemp < 85) {
+            relaxationScore += 0.5;
+        }
+        
+        // Normalize the score to a 1-5 scale
+        let finalScore = Math.round(relaxationScore / 3);
+        
+        // Ensure the score is within the 1-5 range
+        finalScore = Math.max(1, Math.min(5, finalScore));
+        
+        return finalScore;
+    }
+
+    // Fonction pour gérer la soumission du formulaire
+    document.getElementById('teaForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const teaParams = {
+            name: document.getElementById('name').value,
+            type: document.getElementById('type').value,
+            caffeineLevel: parseInt(document.getElementById('caffeineLevel').value),
+            lTheanineLevel: parseInt(document.getElementById('lTheanineLevel').value),
+            aromaPrimary: document.getElementById('aromaPrimary').value,
+            processingMethod: document.getElementById('processingMethod').value,
+            brewingTemp: parseInt(document.getElementById('brewingTemp').value)
+        };
+        
+        const mood = calculateTeaMood(teaParams);
+        const relaxation = calculateTeaRelaxation(teaParams);
+        
+        const resultDiv = document.getElementById('result');
+        resultDiv.innerHTML = `
+            <h2>Résultats pour ${teaParams.name}</h2>
+            <p><strong>Mood:</strong> ${mood}</p>
+            <p><strong>Niveau de Relaxation:</strong> ${relaxation}/5</p>
+        `;
+    });
+    </script>
+</body>
+</html>
