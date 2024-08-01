@@ -1,97 +1,127 @@
 /**
- * Calcule le niveau de relaxation d'un thé basé sur ses caractéristiques.
- * @param {Object} teaParams - Les paramètres du thé.
- * @param {string} teaParams.type - Le type de thé (ex: 'green', 'black', 'oolong', 'white', 'puerh').
- * @param {number} teaParams.caffeineLevel - Le niveau de caféine (1-10).
- * @param {number} teaParams.lTheanineLevel - Le niveau de L-théanine (1-10).
- * @param {string} teaParams.aromaPrimary - L'arôme principal du thé.
- * @param {number} teaParams.brewingTemp - La température d'infusion en Celsius.
- * @returns {number} Le niveau de relaxation calculé du thé (1-10).
+ * Calculates the relaxation level of a tea based on its characteristics.
+ * @param {Object} teaParams - The parameters of the tea.
+ * @param {string} teaParams.type - The type of tea (e.g., 'green', 'black', 'oolong', 'white', 'puerh', 'yellow', 'herbal').
+ * @param {number} teaParams.caffeineLevel - The caffeine level (1-10).
+ * @param {number} teaParams.lTheanineLevel - The L-theanine level (1-10).
+ * @param {string} teaParams.aromaPrimary - The primary aroma of the tea.
+ * @param {string} teaParams.processingMethod - The processing method of the tea.
+ * @returns {number} The calculated relaxation level of the tea (1-10).
  */
 function calculateTeaRelaxation(teaParams) {
-  const { type, caffeineLevel, lTheanineLevel, aromaPrimary, brewingTemp } = teaParams;
+  const { type, caffeineLevel, lTheanineLevel, aromaPrimary, processingMethod } = teaParams;
   
   let relaxationScore = 0;
   
-  // Influence du type
+  // Type influence
   switch (type.toLowerCase()) {
     case 'white':
       relaxationScore += 4;
       break;
     case 'green':
     case 'oolong':
-      relaxationScore += 2;
+      relaxationScore += 3;
       break;
     case 'puerh':
+    case 'yellow':
+      relaxationScore += 2;
+      break;
+    case 'black':
       relaxationScore += 1;
       break;
-    // Le thé noir n'ajoute pas au score de relaxation
+    case 'herbal':
+      relaxationScore += 5;
+      break;
   }
   
-  // Influence de la caféine (relation inverse)
+  // Caffeine influence (inverse relationship)
   relaxationScore += (11 - caffeineLevel);
   
-  // Influence de la L-théanine
+  // L-theanine influence
   relaxationScore += lTheanineLevel;
   
-  // Influence de l'arôme (version étendue)
+  // Aroma influence
   const relaxingAromas = ['lavender', 'chamomile', 'vanilla', 'jasmine', 'rose'];
-  const neutralAromas = ['fruity', 'grassy', 'nutty', 'woody', 'honey'];
-  const stimulatingAromas = ['citrus', 'mint', 'spicy', 'smoky', 'roasted'];
+  const neutralAromas = ['grassy', 'nutty', 'woody', 'honey', 'fruity'];
+  const stimulatingAromas = ['citrus', 'mint', 'cinnamon', 'ginger', 'bergamot'];
 
   if (relaxingAromas.includes(aromaPrimary.toLowerCase())) {
-    relaxationScore += 2.5;
+    relaxationScore += 3;
   } else if (neutralAromas.includes(aromaPrimary.toLowerCase())) {
     relaxationScore += 1.5;
   } else if (stimulatingAromas.includes(aromaPrimary.toLowerCase())) {
     relaxationScore += 0.5;
   } else {
-    // Pour les arômes non listés, on ajoute un score neutre
+    // For unlisted aromas, we add a neutral score
     relaxationScore += 1;
   }
   
-  // Influence de la température d'infusion
-  if (brewingTemp < 70) {
-    relaxationScore += 2;
-  } else if (brewingTemp < 80) {
-    relaxationScore += 1.5;
-  } else if (brewingTemp < 90) {
-    relaxationScore += 1;
+  // Processing method influence
+  switch (processingMethod.toLowerCase()) {
+    case 'steamed':
+    case 'shade-grown':
+      relaxationScore += 2;
+      break;
+    case 'sun-dried':
+    case 'withered':
+      relaxationScore += 1.5;
+      break;
+    case 'oxidised':
+    case 'roasted':
+    case 'pan-fired':
+      relaxationScore += 1;
+      break;
+    case 'fermented':
+    case 'aged':
+      relaxationScore += 0.5;
+      break;
+    case 'smoked':
+    case 'bruised':
+      // These methods don't typically contribute to relaxation
+      break;
+    case 'rolled':
+    case 'cured':
+    case 'blended':
+      relaxationScore += 0.5;
+      break;
+    default:
+      // For unlisted methods, we don't add any points
+      break;
   }
   
-  // Normaliser le score sur une échelle de 1-10
-  let finalScore = Math.round(relaxationScore / 3 * 2);
+  // Normalise the score to a 1-10 scale
+  let finalScore = Math.round(relaxationScore);
   
-  // S'assurer que le score est dans la plage 1-10
+  // Ensure the score is within the 1-10 range
   finalScore = Math.max(1, Math.min(10, finalScore));
   
   return finalScore;
 }
 
-// Exemples d'utilisation :
+// Usage examples:
 const gyokuroRelaxation = calculateTeaRelaxation({
   type: 'green',
   caffeineLevel: 6,
   lTheanineLevel: 8,
   aromaPrimary: 'grassy',
-  brewingTemp: 60
+  processingMethod: 'shade-grown'
 });
-console.log('Niveau de relaxation du Gyokuro:', gyokuroRelaxation);
+console.log('Gyokuro relaxation level:', gyokuroRelaxation);
 
-const jasminePearlRelaxation = calculateTeaRelaxation({
-  type: 'green',
-  caffeineLevel: 5,
-  lTheanineLevel: 7,
-  aromaPrimary: 'jasmine',
-  brewingTemp: 80
-});
-console.log('Niveau de relaxation du Thé au Jasmin:', jasminePearlRelaxation);
-
-const lapsangSouchongRelaxation = calculateTeaRelaxation({
+const earlGreyRelaxation = calculateTeaRelaxation({
   type: 'black',
-  caffeineLevel: 8,
-  lTheanineLevel: 4,
-  aromaPrimary: 'smoky',
-  brewingTemp: 95
+  caffeineLevel: 7,
+  lTheanineLevel: 3,
+  aromaPrimary: 'bergamot',
+  processingMethod: 'oxidised'
 });
-console.log('Niveau de relaxation du Lapsang Souchong:', lapsangSouchongRelaxation);
+console.log('Earl Grey relaxation level:', earlGreyRelaxation);
+
+const chamomileRelaxation = calculateTeaRelaxation({
+  type: 'herbal',
+  caffeineLevel: 1,
+  lTheanineLevel: 1,
+  aromaPrimary: 'chamomile',
+  processingMethod: 'dried'
+});
+console.log('Chamomile relaxation level:', chamomileRelaxation);
