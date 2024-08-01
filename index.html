@@ -54,6 +54,19 @@
             background: #e7f3d5;
             border-radius: 4px;
         }
+        .relaxation-bar {
+    width: 100%;
+    height: 20px;
+    background-color: #e0e0e0;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-top: 10px;
+}
+.relaxation-progress {
+    height: 100%;
+    border-radius: 10px;
+    transition: width 0.5s ease-out;
+}
     </style>
 </head>
 <body>
@@ -253,7 +266,21 @@
         return finalScore;
     }
 
-    // Fonction pour gérer la soumission du formulaire
+        // Nouvelle fonction pour générer la couleur de la barre de relaxation
+    function getRelaxationColor(relaxationLevel) {
+        const green = [76, 175, 80];  // RGB for #4CAF50 (green)
+        const yellow = [255, 235, 59];  // RGB for #FFEB3B (yellow)
+        
+        const ratio = (relaxationLevel - 1) / 4;  // 1 to 5 mapped to 0 to 1
+        
+        const r = Math.round(yellow[0] * (1 - ratio) + green[0] * ratio);
+        const g = Math.round(yellow[1] * (1 - ratio) + green[1] * ratio);
+        const b = Math.round(yellow[2] * (1 - ratio) + green[2] * ratio);
+        
+        return `rgb(${r}, ${g}, ${b})`;
+    }
+        
+   // Fonction modifiée pour gérer la soumission du formulaire
     document.getElementById('teaForm').addEventListener('submit', function(e) {
         e.preventDefault();
         
@@ -275,6 +302,9 @@
             <h2>Résultats pour ${teaParams.name}</h2>
             <p><strong>Mood:</strong> ${mood}</p>
             <p><strong>Niveau de Relaxation:</strong> ${relaxation}/5</p>
+            <div class="relaxation-bar">
+                <div class="relaxation-progress" style="width: ${relaxation*20}%; background-color: ${getRelaxationColor(relaxation)};"></div>
+            </div>
         `;
     });
     </script>
