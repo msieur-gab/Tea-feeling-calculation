@@ -211,60 +211,65 @@
     }
 
     // Fonction pour calculer le niveau de relaxation du thé
-    function calculateTeaRelaxation(teaParams) {
-        const { type, caffeineLevel, lTheanineLevel, aromaPrimary, brewingTemp } = teaParams;
-        
-        let relaxationScore = 0;
-        
-        // Type influence
-        switch (type.toLowerCase()) {
-            case 'white':
-                relaxationScore += 2;
-                break;
-            case 'green':
-            case 'oolong':
-                relaxationScore += 1;
-                break;
-            case 'puerh':
-                relaxationScore += 0.5;
-                break;
-            // Black tea doesn't add to relaxation score
-        }
-        
-        // Caffeine influence (inverse relationship)
-        relaxationScore += (6 - caffeineLevel);
-        
-        // L-theanine influence
-        relaxationScore += lTheanineLevel;
-        
-        // Aroma influence
-        switch (aromaPrimary.toLowerCase()) {
-            case 'floral':
-            case 'herbal':
-                relaxationScore += 1;
-                break;
-            case 'fruity':
-            case 'grassy':
-                relaxationScore += 0.5;
-                break;
-            // Other aromas don't add to relaxation score
-        }
-        
-        // Brewing temperature influence
-        if (brewingTemp < 75) {
-            relaxationScore += 1;
-        } else if (brewingTemp < 85) {
-            relaxationScore += 0.5;
-        }
-        
-        // Normalize the score to a 1-5 scale
-        let finalScore = Math.round(relaxationScore / 3);
-        
-        // Ensure the score is within the 1-5 range
-        finalScore = Math.max(1, Math.min(5, finalScore));
-        
-        return finalScore;
-    }
+   function calculateTeaRelaxation(teaParams) {
+  const { type, caffeineLevel, lTheanineLevel, aromaPrimary, brewingTemp } = teaParams;
+  
+  let relaxationScore = 0;
+  
+  // Influence du type
+  switch (type.toLowerCase()) {
+    case 'white':
+      relaxationScore += 4;
+      break;
+    case 'green':
+    case 'oolong':
+      relaxationScore += 2;
+      break;
+    case 'puerh':
+      relaxationScore += 1;
+      break;
+    // Le thé noir n'ajoute pas au score de relaxation
+  }
+  
+  // Influence de la caféine (relation inverse)
+  relaxationScore += (11 - caffeineLevel);
+  
+  // Influence de la L-théanine
+  relaxationScore += lTheanineLevel;
+  
+  // Influence de l'arôme (version étendue)
+  const relaxingAromas = ['lavender', 'chamomile', 'vanilla', 'jasmine', 'rose'];
+  const neutralAromas = ['fruity', 'grassy', 'nutty', 'woody', 'honey'];
+  const stimulatingAromas = ['citrus', 'mint', 'spicy', 'smoky', 'roasted'];
+
+  if (relaxingAromas.includes(aromaPrimary.toLowerCase())) {
+    relaxationScore += 2.5;
+  } else if (neutralAromas.includes(aromaPrimary.toLowerCase())) {
+    relaxationScore += 1.5;
+  } else if (stimulatingAromas.includes(aromaPrimary.toLowerCase())) {
+    relaxationScore += 0.5;
+  } else {
+    // Pour les arômes non listés, on ajoute un score neutre
+    relaxationScore += 1;
+  }
+  
+  // Influence de la température d'infusion
+  if (brewingTemp < 70) {
+    relaxationScore += 2;
+  } else if (brewingTemp < 80) {
+    relaxationScore += 1.5;
+  } else if (brewingTemp < 90) {
+    relaxationScore += 1;
+  }
+  
+  // Normaliser le score sur une échelle de 1-10
+  let finalScore = Math.round(relaxationScore / 3 * 2);
+  
+  // S'assurer que le score est dans la plage 1-10
+  finalScore = Math.max(1, Math.min(10, finalScore));
+  
+  return finalScore;
+}
 
         // Nouvelle fonction pour générer la couleur de la barre de relaxation
     function getRelaxationColor(relaxationLevel) {
